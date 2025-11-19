@@ -12,6 +12,7 @@ const claveError = document.getElementById('loginClaveError');
 const clave2Error = document.getElementById('loginClave2Error');
 const loginToggleText = document.getElementById('loginToggleText');
 const headerUser = document.getElementById('headerUser');
+const logoutButton = document.getElementById('logoutButton');
 
 // secciones
 const menuItems = document.querySelectorAll('.menu-item');
@@ -173,6 +174,30 @@ loginButton.addEventListener('click', () => {
   }
 });
 
+// ====== CERRAR SESIÓN ======
+if (logoutButton) {
+  logoutButton.addEventListener('click', () => {
+    // ocultar app y mostrar login de nuevo
+    app.style.display = 'none';
+    app.setAttribute('aria-hidden', 'true');
+    loginBackdrop.style.display = 'flex';
+
+    // limpiar campos de login
+    if (correoInput) correoInput.value = '';
+    if (claveInput) claveInput.value = '';
+    if (clave2Input) clave2Input.value = '';
+
+    // reset visual de usuario
+    headerUser.innerHTML = `
+      <span class="name">Invitado</span>
+      <span class="role">No autenticado</span>
+    `;
+
+    // volver a modo login simple
+    setMode(false);
+  });
+}
+
 // ====== NAVEGACIÓN ENTRE MÓDULOS ======
 function showSection(name) {
   Object.keys(sections).forEach((k) => {
@@ -323,7 +348,7 @@ if(memoryBtn && memoryBoard){
   });
 }
 
-
+// ====== DEMO EVALUACIÓN ======
 const quizBtn = document.getElementById('startQuiz');
 const quizResult = document.getElementById('quizResult');
 if (quizBtn && quizResult) {
@@ -332,3 +357,4 @@ if (quizBtn && quizResult) {
       '<p>Demo: sistema de preguntas y puntaje para el niño.</p>';
   });
 }
+

@@ -197,15 +197,132 @@ tiles.forEach((t) =>
   })
 );
 
-// ====== DEMO JUEGOS / EVALUACIÓN ======
+// ====== JUEGO DE MEMORIA (FUNCIONAL) ======
 const memoryBtn = document.getElementById('startMemory');
-const memoryResult = document.getElementById('memoryResult');
-if (memoryBtn && memoryResult) {
-  memoryBtn.addEventListener('click', () => {
-    memoryResult.textContent =
-      'Demo: aquí irá el juego de memoria (asociar seña con imagen).';
+const memoryBoard = document.getElementById('memoryBoard');
+const memoryStatus = document.getElementById('memoryStatus');
+const memoryMovesSpan = document.getElementById('memoryMoves');
+const memoryMatchesSpan = document.getElementById('memoryMatches');
+
+let memoryCards = [];
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
+let moves = 0;
+let matches = 0;
+
+// pares simples, se pueden cambiar por íconos o letras de señas
+const memoryValues = ['A','A','B','B','C','C'];
+
+function shuffle(array){
+  for(let i = array.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function createMemoryBoard(){
+  memoryBoard.innerHTML = '';
+  const shuffled = shuffle([...memoryValues]);
+  memoryCards = [];
+  firstCard = null;
+  secondCard = null;
+  lockBoard = false;
+  moves = 0;
+  matches = 0;
+  memoryMovesSpan.textContent = moves;
+  memoryMatchesSpan.textContent = matches;
+  memoryStatus.textContent = 'Encuentra las parejas.';
+
+  shuffled.forEach((value, index) => {
+    const card = document.createElement('button');
+    card.className = 'memory-card';
+    card.setAttribute('data-value', value);
+    card.setAttribute('data-index', index);
+
+    const inner = document.createElement('div');
+    inner.className = 'memory-card-inner';
+    inner.textContent = '?'; // cara oculta
+    card.appendChild(inner);
+
+    card.addEventListener('click', () => handleCardClick(card));
+    memoryBoard.appendChild(card);
+    memoryCards.push(card);
   });
 }
+
+function handleCardClick(card){
+  if(lockBoard) return;
+  if(card.classList.contains('revealed')) return;
+  if(card === firstCard) return;
+
+  revealCard(card);
+
+  if(!firstCard){
+    firstCard = card;
+  }else{
+    secondCard = card;
+    lockBoard = true;
+    moves++;
+    memoryMovesSpan.textContent = moves;
+
+    const v1 = firstCard.getAttribute('data-value');
+    const v2 = secondCard.getAttribute('data-value');
+
+    if(v1 === v2){
+      matches++;
+      memoryMatchesSpan.textContent = matches;
+      disablePair();
+      if(matches === memoryValues.length / 2){
+        memoryStatus.textContent =
+          `¡Genial! Completaste el juego en ${moves} intentos.`;
+      }else{
+        memoryStatus.textContent = '¡Muy bien! Sigue buscando parejas.';
+      }
+    }else{
+      memoryStatus.textContent = 'No coinciden, intenta de nuevo.';
+      setTimeout(hidePair, 900);
+    }
+  }
+}
+
+function revealCard(card){
+  card.classList.add('revealed');
+  const inner = card.querySelector('.memory-card-inner');
+  inner.textContent = card.getAttribute('data-value');
+}
+
+function hidePair(){
+  if(firstCard) {
+    firstCard.classList.remove('revealed');
+    firstCard.querySelector('.memory-card-inner').textContent = '?';
+  }
+  if(secondCard) {
+    secondCard.classList.remove('revealed');
+    secondCard.querySelector('.memory-card-inner').textContent = '?';
+  }
+  resetTurn();
+}
+
+function disablePair(){
+  if(firstCard) firstCard.classList.add('disabled');
+  if(secondCard) secondCard.classList.add('disabled');
+  resetTurn();
+}
+
+function resetTurn(){
+  [firstCard, secondCard] = [null, null];
+  lockBoard = false;
+}
+
+// botón iniciar / reiniciar
+if(memoryBtn && memoryBoard){
+  memoryBtn.addEventListener('click', () => {
+    createMemoryBoard();
+  });
+}
+
 
 const quizBtn = document.getElementById('startQuiz');
 const quizResult = document.getElementById('quizResult');

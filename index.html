@@ -12,7 +12,7 @@
     <div class="login-card" role="dialog" aria-labelledby="loginTitle">
       <header class="login-header">
         <div class="logo-area">
-          <div class="logo-circle">S</div>
+          <div class="logo-circle">S</</div>
           <div class="logo-text">
             <h1 id="loginTitle" class="logo-title">Señalandia</h1>
             <div class="logo-subtitle">Aprende con señas, juega y sonríe</div>
@@ -77,9 +77,15 @@
           <div class="logo-subtitle">Plataforma inclusiva para niños</div>
         </div>
       </div>
-      <div class="header-user" id="headerUser" aria-live="polite">
-        <span class="name">Invitado</span>
-        <span class="role">No autenticado</span>
+
+      <div class="header-right">
+        <div class="header-user" id="headerUser" aria-live="polite">
+          <span class="name">Invitado</span>
+          <span class="role">No autenticado</span>
+        </div>
+        <button id="logoutButton" class="btn-logout">
+          Cerrar sesión
+        </button>
       </div>
     </header>
 
@@ -193,16 +199,26 @@
 
         <!-- MODULO: JUEGOS -->
         <div id="section-juegos" class="section" hidden>
-          <h2>Juegos de asociación</h2>
-          <p>Memoria, emparejar imágenes con señas y más.</p>
-          <div id="game-area">
-            <p class="text-muted">
-              (Modo demo) Juego de memoria sencillo integrado.
-            </p>
-            <button class="btn btn-primary" id="startMemory">
-              Iniciar memoria (demo)
-            </button>
-            <div id="memoryResult" style="margin-top:10px"></div>
+          <h2>Juegos de memoria</h2>
+          <p>Empareja las tarjetas iguales. Ideal para trabajar memoria visual.</p>
+
+          <div class="game-panel">
+            <div class="game-info">
+              <button class="btn btn-primary" id="startMemory">
+                Iniciar / Reiniciar juego
+              </button>
+              <div id="memoryStatus" class="memory-status">
+                Haz clic en el botón para comenzar.
+              </div>
+              <div id="memoryStats" class="memory-stats">
+                Intentos: <span id="memoryMoves">0</span> |
+                Aciertos: <span id="memoryMatches">0</span>
+              </div>
+            </div>
+
+            <div id="memoryBoard" class="memory-board">
+              <!-- Se llena con JS -->
+            </div>
           </div>
         </div>
 

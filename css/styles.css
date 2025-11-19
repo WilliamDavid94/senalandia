@@ -120,7 +120,7 @@ body{
 .app-container{
   width:100%;
   max-width:1200px;
-  margin:20px auto;          /* centrado dentro de la página */
+  margin:20px auto;
   background:#fff;
   border-radius:14px;
   box-shadow:0 30px 80px rgba(12,30,15,0.08);
@@ -321,7 +321,7 @@ body{
 .memory-card{
   position:relative;
   width:100%;
-  padding-top:100%; /* cuadradas */
+  padding-top:100%;
   border-radius:10px;
   background:linear-gradient(145deg,#ecfdf3,#fefce8);
   border:1px solid #d4e3d9;
@@ -363,3 +363,4 @@ body{
     max-width:96%;
   }
 }
+

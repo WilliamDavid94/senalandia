@@ -2,103 +2,329 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Login - Senalandia</title>
+  <title>Señalandia - Plataforma JAC</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <div id="root"></div>
-
-  <!-- React y ReactDOM desde CDN -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-
-  <!-- Babel para poder escribir JSX directamente -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <!-- Tu componente Login con JSX -->
-  <script type="text/babel">
-    const { useState } = React;
-
-    function Login() {
-      const [correo, setCorreo] = useState("");
-      const [clave, setClave] = useState("");
-
-      const handleLogin = (e) => {
-        e.preventDefault();
-        alert("Bienvenido " + correo);
-      };
-
-      const pageStyle = {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "80vh",
-        backgroundColor: "#FEF3C7", // similar a bg-yellow-100
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      };
-
-      const formStyle = {
-        backgroundColor: "#FFFFFF",
-        padding: "1.5rem",
-        borderRadius: "0.75rem",
-        boxShadow: "0 10px 15px rgba(0, 0, 0, 0.1)",
-        width: "24rem",
-      };
-
-      const titleStyle = {
-        color: "#16A34A", // verde
-        fontSize: "1.5rem",
-        marginBottom: "1rem",
-        fontWeight: "700",
-        textAlign: "center",
-      };
-
-      const inputStyle = {
-        border: "1px solid #D1D5DB",
-        padding: "0.5rem",
-        width: "100%",
-        marginBottom: "0.75rem",
-        borderRadius: "0.375rem",
-        outline: "none",
-      };
-
-      const buttonStyle = {
-        backgroundColor: "#16A34A",
-        color: "#FFFFFF",
-        padding: "0.5rem",
-        width: "100%",
-        borderRadius: "0.375rem",
-        border: "none",
-        cursor: "pointer",
-        fontWeight: "600",
-      };
-
-      return (
-        <div style={pageStyle}>
-          <form onSubmit={handleLogin} style={formStyle}>
-            <h2 style={titleStyle}>Iniciar Sesión</h2>
-            <input
-              style={inputStyle}
-              placeholder="Correo"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-            />
-            <input
-              style={inputStyle}
-              type="password"
-              placeholder="Clave"
-              value={clave}
-              onChange={(e) => setClave(e.target.value)}
-            />
-            <button style={buttonStyle}>Ingresar</button>
-          </form>
+  <!-- CONTENEDOR GENERAL -->
+  <div class="app-container" id="app">
+    <!-- ENCABEZADO -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-circle">S</div>
+        <div class="logo-text">
+          <span class="logo-title">Señalandia</span>
+          <span class="logo-subtitle">Plataforma de gestión comunitaria</span>
         </div>
-      );
-    }
+      </div>
+      <div class="header-user" id="headerUser">
+        <span class="name">Invitado</span>
+        <span class="role">No autenticado</span>
+      </div>
+    </header>
 
-    const rootElement = document.getElementById("root");
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(<Login />);
-  </script>
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="app-main">
+      <!-- MENÚ LATERAL -->
+      <aside class="sidebar">
+        <div class="sidebar-title">Módulos</div>
+        <ul class="menu-list">
+          <li class="menu-item active" data-section="dashboard">
+            <span class="label">
+              <span class="icon-dot"></span>
+              Panel general
+            </span>
+            <span class="tag">Inicio</span>
+          </li>
+          <li class="menu-item" data-section="afiliados">
+            <span class="label">
+              <span class="icon-dot"></span>
+              Afiliados
+            </span>
+          </li>
+          <li class="menu-item" data-section="directivos">
+            <span class="label">
+              <span class="icon-dot"></span>
+              Directivos
+            </span>
+          </li>
+          <li class="menu-item" data-section="documentos">
+            <span class="label">
+              <span class="icon-dot"></span>
+              Documentos
+            </span>
+          </li>
+          <li class="menu-item" data-section="reportes">
+            <span class="label">
+              <span class="icon-dot"></span>
+              Reportes
+            </span>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- CONTENIDO CENTRAL -->
+      <main class="content-area">
+        <div class="content-header">
+          <div class="content-header-title">
+            <h2 id="sectionTitle">Panel general</h2>
+            <p id="sectionDescription">
+              Visualiza el estado general de la Junta de Acción Comunal, afiliados y documentos registrados.
+            </p>
+          </div>
+          <div class="content-header-actions">
+            <button class="btn btn-ghost" id="btnCerrarSesion" style="display:none;">Cerrar sesión</button>
+            <button class="btn btn-primary">
+              + Nuevo registro
+            </button>
+          </div>
+        </div>
+
+        <!-- Secciones -->
+        <section id="section-dashboard">
+          <div class="cards-grid">
+            <div class="card">
+              <h3>Afiliados activos</h3>
+              <p>Personas registradas y con afiliación vigente en la JAC.</p>
+              <div class="stat-value">124</div>
+              <div class="stat-label">Última actualización: hoy</div>
+            </div>
+
+            <div class="card">
+              <h3>Directivos</h3>
+              <p>Miembros de la mesa directiva registrados en el sistema.</p>
+              <div class="stat-value">8</div>
+              <span class="pill success">Vigencia 2024 - 2028</span>
+            </div>
+
+            <div class="card">
+              <h3>Documentos</h3>
+              <p>Actas, reglamentos e informes cargados en Señalandia.</p>
+              <div class="stat-value">57</div>
+              <span class="pill info">Con respaldo en la nube</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Últimos movimientos</h3>
+            <p>Registros recientes de afiliados, directivos y documentos.</p>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Responsable</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Afiliado</td>
+                    <td>Registro de nuevo afiliado: María López</td>
+                    <td>coordinador.jac</td>
+                    <td>2025-11-18</td>
+                    <td><span class="pill success">Aprobado</span></td>
+                  </tr>
+                  <tr>
+                    <td>Documento</td>
+                    <td>Carga de acta de reunión ordinaria</td>
+                    <td>secretario</td>
+                    <td>2025-11-17</td>
+                    <td><span class="pill info">Publicado</span></td>
+                  </tr>
+                  <tr>
+                    <td>Directivo</td>
+                    <td>Actualización de datos de presidente JAC</td>
+                    <td>admin.junta</td>
+                    <td>2025-11-16</td>
+                    <td><span class="pill warning">En revisión</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="section-afiliados" style="display:none;">
+          <div class="card">
+            <h3>Gestión de afiliados</h3>
+            <p>Consulta, registro y actualización de afiliados de la comunidad.</p>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Documento</th>
+                    <th>Barrio / Vereda</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Carlos Rodríguez</td>
+                    <td>1012345678</td>
+                    <td>San Miguel</td>
+                    <td><span class="pill success">Activo</span></td>
+                  </tr>
+                  <tr>
+                    <td>María López</td>
+                    <td>1009876543</td>
+                    <td>Villa Esperanza</td>
+                    <td><span class="pill success">Activo</span></td>
+                  </tr>
+                  <tr>
+                    <td>José Martínez</td>
+                    <td>801234567</td>
+                    <td>Altos del Sol</td>
+                    <td><span class="pill warning">Pendiente actualización</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="section-directivos" style="display:none;">
+          <div class="card">
+            <h3>Directivos de la JAC</h3>
+            <p>Listado de cargos y responsables actuales.</p>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cargo</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Presidente</td>
+                    <td>Ana Gómez</td>
+                    <td>320 000 0000</td>
+                    <td>presidencia@senalandia.org</td>
+                  </tr>
+                  <tr>
+                    <td>Vicepresidente</td>
+                    <td>Jorge Pérez</td>
+                    <td>321 123 4567</td>
+                    <td>vicepresidencia@senalandia.org</td>
+                  </tr>
+                  <tr>
+                    <td>Secretario</td>
+                    <td>Lucía Herrera</td>
+                    <td>300 987 6543</td>
+                    <td>secretaria@senalandia.org</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="section-documentos" style="display:none;">
+          <div class="card">
+            <h3>Documentos de la JAC</h3>
+            <p>Relación de actas, reglamentos y soportes almacenados en la plataforma.</p>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Título</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Acta</td>
+                    <td>Reunión ordinaria 05-2025</td>
+                    <td>2025-05-12</td>
+                    <td><span class="pill info">Publicado</span></td>
+                  </tr>
+                  <tr>
+                    <td>Reglamento</td>
+                    <td>Reglamento interno actualizado</td>
+                    <td>2025-03-01</td>
+                    <td><span class="pill success">Vigente</span></td>
+                  </tr>
+                  <tr>
+                    <td>Informe</td>
+                    <td>Informe de gestión semestral</td>
+                    <td>2025-06-30</td>
+                    <td><span class="pill warning">En revisión</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="section-reportes" style="display:none;">
+          <div class="card">
+            <h3>Reportes y estadísticas</h3>
+            <p>Resumen gráfico del comportamiento de afiliados, directivos y documentos.</p>
+            <p class="text-muted">
+              * Esta es una maqueta de demostración. Los reportes reales pueden conectarse a la base de datos del sistema Señalandia.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- LOGIN (pantalla inicial) -->
+  <div class="login-backdrop" id="loginBackdrop">
+    <div class="login-card">
+      <div class="login-badge"></div>
+      <div class="login-header">
+        <div class="logo-area login-logo">
+          <div class="logo-circle">S</div>
+          <div class="logo-text">
+            <span class="logo-title">Señalandia</span>
+            <span class="logo-subtitle">Acceso a la plataforma</span>
+          </div>
+        </div>
+        <p class="login-subtitle">
+          Inicia sesión para gestionar afiliados, directivos y documentos de la Junta de Acción Comunal.
+        </p>
+      </div>
+
+      <div class="login-body">
+        <div class="login-field">
+          <label class="login-label" for="loginCorreo">Correo electrónico</label>
+          <input id="loginCorreo" class="login-input" type="email" placeholder="ejemplo@correo.com" />
+          <div class="login-helper">Usa el correo asignado por la JAC.</div>
+          <div class="login-error" id="loginCorreoError">Ingresa un correo válido.</div>
+        </div>
+
+        <div class="login-field">
+          <label class="login-label" for="loginClave">Contraseña</label>
+          <input id="loginClave" class="login-input" type="password" placeholder="••••••••" />
+          <div class="login-helper">Por seguridad, no compartas tu contraseña.</div>
+          <div class="login-error" id="loginClaveError">La contraseña es obligatoria.</div>
+        </div>
+      </div>
+
+      <div class="login-footer">
+        <button class="login-button" id="loginButton">
+          <span>Ingresar</span>
+          <span>→</span>
+        </button>
+        <p class="login-extra">
+          Plataforma de apoyo a la gestión comunitaria. <br/>
+          <strong>Versión demostración académica.</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
+

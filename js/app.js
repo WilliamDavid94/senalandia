@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     evaluacion: document.getElementById('section-evaluacion'),
   };
 
-  // ====== UTIL ======
+  // ====== UTIL LOGIN ======
   function isValidEmail(e) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
   }
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (homeItem) homeItem.classList.add('active');
   }
 
-  // ====== INICIALIZACIÓN (revisar si hay sesión) ======
+  // ====== INICIO (SESION GUARDADA) ======
   const existingUser = getCurrentUser();
   if (existingUser) {
     showAppForUser(existingUser);
@@ -220,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setMode(false);
   };
 
-  // extra: también por addEventListener
   if (logoutButton) {
     logoutButton.addEventListener('click', () => {
       window.senalandiaLogout();
@@ -245,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   );
 
-  // ====== JUEGO DE MEMORIA ======
+  // ====== JUEGO DE MEMORIA: LETRA + SEÑA ======
   const memoryBtn = document.getElementById('startMemory');
   const memoryBoard = document.getElementById('memoryBoard');
   const memoryStatus = document.getElementById('memoryStatus');
@@ -258,7 +257,15 @@ document.addEventListener('DOMContentLoaded', () => {
   let moves = 0;
   let matches = 0;
 
-  const memoryValues = ['A','A','B','B','C','C'];
+  // Cada pareja tiene un "id" y dos tipos: "letra" y "seña"
+  const pairs = [
+    { id: 'A', type: 'letra', text: 'Letra: A' },
+    { id: 'A', type: 'seña',  text: 'Seña de A ✋' },
+    { id: 'B', type: 'letra', text: 'Letra: B' },
+    { id: 'B', type: 'seña',  text: 'Seña de B ✋' },
+    { id: 'C', type: 'letra', text: 'Letra: C' },
+    { id: 'C', type: 'seña',  text: 'Seña de C ✋' },
+  ];
 
   function shuffle(array){
     for(let i = array.length - 1; i > 0; i--){
@@ -271,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function createMemoryBoard(){
     if (!memoryBoard) return;
     memoryBoard.innerHTML = '';
-    const shuffled = shuffle([...memoryValues]);
+    const shuffled = shuffle([...pairs]);
     firstCard = null;
     secondCard = null;
     lockBoard = false;
@@ -279,12 +286,14 @@ document.addEventListener('DOMContentLoaded', () => {
     matches = 0;
     if (memoryMovesSpan) memoryMovesSpan.textContent = moves;
     if (memoryMatchesSpan) memoryMatchesSpan.textContent = matches;
-    if (memoryStatus) memoryStatus.textContent = 'Encuentra las parejas.';
+    if (memoryStatus)
+      memoryStatus.textContent = 'Encuentra la pareja: letra + seña correspondiente.';
 
-    shuffled.forEach((value, index) => {
+    shuffled.forEach((data, index) => {
       const card = document.createElement('button');
       card.className = 'memory-card';
-      card.setAttribute('data-value', value);
+      card.setAttribute('data-id', data.id);
+      card.setAttribute('data-type', data.type);
       card.setAttribute('data-index', index);
 
       const inner = document.createElement('div');
@@ -292,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inner.textContent = '?';
       card.appendChild(inner);
 
+      card.dataset.text = data.text; // para mostrar al revelar
       card.addEventListener('click', () => handleCardClick(card));
       memoryBoard.appendChild(card);
     });
@@ -312,24 +322,29 @@ document.addEventListener('DOMContentLoaded', () => {
       moves++;
       if (memoryMovesSpan) memoryMovesSpan.textContent = moves;
 
-      const v1 = firstCard.getAttribute('data-value');
-      const v2 = secondCard.getAttribute('data-value');
+      const id1 = firstCard.getAttribute('data-id');
+      const id2 = secondCard.getAttribute('data-id');
+      const type1 = firstCard.getAttribute('data-type');
+      const type2 = secondCard.getAttribute('data-type');
 
-      if(v1 === v2){
+      // Coinciden si tienen el mismo id y tipos distintos (letra vs seña)
+      const isMatch = id1 === id2 && type1 !== type2;
+
+      if(isMatch){
         matches++;
         if (memoryMatchesSpan) memoryMatchesSpan.textContent = matches;
         disablePair();
-        if(matches === memoryValues.length / 2){
+        if(matches === pairs.length / 2){
           if (memoryStatus)
             memoryStatus.textContent =
-              `¡Genial! Completaste el juego en ${moves} intentos.`;
+              `¡Excelente! Emparejaste todas las letras con sus señas en ${moves} intentos.`;
         }else{
           if (memoryStatus)
-            memoryStatus.textContent = '¡Muy bien! Sigue buscando parejas.';
+            memoryStatus.textContent = '¡Muy bien! Sigue emparejando letras con señas.';
         }
       }else{
         if (memoryStatus)
-          memoryStatus.textContent = 'No coinciden, intenta de nuevo.';
+          memoryStatus.textContent = 'No es la seña correcta, inténtalo de nuevo.';
         setTimeout(hidePair, 900);
       }
     }
@@ -338,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function revealCard(card){
     card.classList.add('revealed');
     const inner = card.querySelector('.memory-card-inner');
-    if (inner) inner.textContent = card.getAttribute('data-value');
+    if (inner) inner.textContent = card.dataset.text || '';
   }
 
   function hidePair(){
@@ -378,8 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (quizBtn && quizResult) {
     quizBtn.addEventListener('click', () => {
       quizResult.innerHTML =
-        '<p>Demo: sistema de preguntas y puntaje para el niño.</p>';
+        '<p>Demo: aquí puedes agregar preguntas tipo selección múltiple sobre el abecedario y vocabulario en señas.</p>';
     });
   }
 });
-

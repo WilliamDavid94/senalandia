@@ -83,7 +83,12 @@
           <span class="name">Invitado</span>
           <span class="role">No autenticado</span>
         </div>
-        <button id="logoutButton" class="btn-logout">
+        <!-- onclick a función global para garantizar que funcione -->
+        <button
+          id="logoutButton"
+          class="btn-logout"
+          onclick="window.senalandiaLogout && window.senalandiaLogout()"
+        >
           Cerrar sesión
         </button>
       </div>

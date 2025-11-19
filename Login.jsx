@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+const { useState } = React;
 
 export default function Login() {
   const [correo, setCorreo] = useState("");
@@ -10,13 +9,69 @@ export default function Login() {
     alert(`Bienvenido ${correo}`);
   };
 
+  const pageStyle = {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "80vh",
+    backgroundColor: "#FEF3C7", // similar a bg-yellow-100
+    fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  };
+
+  const formStyle = {
+    backgroundColor: "#FFFFFF",
+    padding: "1.5rem",
+    borderRadius: "0.75rem",
+    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.1)",
+    width: "24rem",
+  };
+
+  const titleStyle = {
+    color: "#16A34A", // verde
+    fontSize: "1.5rem",
+    marginBottom: "1rem",
+    fontWeight: "700",
+    textAlign: "center",
+  };
+
+  const inputStyle = {
+    border: "1px solid #D1D5DB",
+    padding: "0.5rem",
+    width: "100%",
+    marginBottom: "0.75rem",
+    borderRadius: "0.375rem",
+    outline: "none",
+  };
+
+  const buttonStyle = {
+    backgroundColor: "#16A34A",
+    color: "#FFFFFF",
+    padding: "0.5rem",
+    width: "100%",
+    borderRadius: "0.375rem",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: "600",
+  };
+
   return (
-    <div className="flex justify-center items-center h-[80vh] bg-yellow-100">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded-xl shadow-lg w-96">
-        <h2 className="text-green-600 text-2xl mb-4 font-bold">Iniciar Sesión</h2>
-        <input className="border p-2 w-full mb-3" placeholder="Correo" value={correo} onChange={(e) => setCorreo(e.target.value)} />
-        <input className="border p-2 w-full mb-3" type="password" placeholder="Clave" value={clave} onChange={(e) => setClave(e.target.value)} />
-        <button className="bg-green-600 text-white px-4 py-2 rounded w-full">Ingresar</button>
+    <div style={pageStyle}>
+      <form onSubmit={handleLogin} style={formStyle}>
+        <h2 style={titleStyle}>Iniciar Sesión</h2>
+        <input
+          style={inputStyle}
+          placeholder="Correo"
+          value={correo}
+          onChange={(e) => setCorreo(e.target.value)}
+        />
+        <input
+          style={inputStyle}
+          type="password"
+          placeholder="Clave"
+          value={clave}
+          onChange={(e) => setClave(e.target.value)}
+        />
+        <button style={buttonStyle}>Ingresar</button>
       </form>
     </div>
   );

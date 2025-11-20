@@ -359,6 +359,14 @@ body::after{
   color:#6b7280;
   margin-top:6px;
 }
+.video-link{
+  font-size:13px;
+  margin-top:4px;
+}
+.video-link a{
+  color:#1d4ed8;
+  text-decoration:underline;
+}
 
 /* BOTONES GENERALES */
 .btn{

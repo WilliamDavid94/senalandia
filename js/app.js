@@ -1,414 +1,324 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // ====== ELEMENTOS ======
-  const app = document.getElementById('app');
-  const loginBackdrop = document.getElementById('loginBackdrop');
-  const loginButton = document.getElementById('loginButton');
-  const loginButtonText = document.getElementById('loginButtonText');
-  const correoInput = document.getElementById('loginCorreo');
-  const claveInput = document.getElementById('loginClave');
-  const clave2Field = document.getElementById('loginClave2Field');
-  const clave2Input = document.getElementById('loginClave2');
-  const correoError = document.getElementById('loginCorreoError');
-  const claveError = document.getElementById('loginClaveError');
-  const clave2Error = document.getElementById('loginClave2Error');
-  const loginToggleText = document.getElementById('loginToggleText');
-  const headerUser = document.getElementById('headerUser');
-  const logoutButton = document.getElementById('logoutButton');
+// --- Utilidad para usuarios en localStorage ---
+const STORAGE_KEY = "senalandia_users";
+const SESSION_KEY = "senalandia_session";
 
-  const menuItems = document.querySelectorAll('.menu-item');
-  const tiles = document.querySelectorAll('.tile');
-  const sections = {
-    home: document.getElementById('section-home'),
-    abecedario: document.getElementById('section-abecedario'),
-    vocabulario: document.getElementById('section-vocabulario'),
-    numeros: document.getElementById('section-numeros'),
-    juegos: document.getElementById('section-juegos'),
-    evaluacion: document.getElementById('section-evaluacion'),
-  };
+function getUsers() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
 
-  // ====== FUNCIONES UTIL LOGIN ======
-  function isValidEmail(e) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-  }
-  function getUsers() {
-    try {
-      return JSON.parse(localStorage.getItem('senalandia_users') || '[]');
-    } catch {
-      return [];
-    }
-  }
-  function saveUsers(u) {
-    localStorage.setItem('senalandia_users', JSON.stringify(u));
-  }
-  function findUser(email) {
-    return getUsers().find(
-      (x) => x.email.toLowerCase() === email.toLowerCase()
-    );
-  }
-  function setCurrentUser(user) {
-    if (user) {
-      localStorage.setItem('senalandia_current_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('senalandia_current_user');
-    }
-  }
-  function getCurrentUser() {
-    try {
-      return JSON.parse(localStorage.getItem('senalandia_current_user') || 'null');
-    } catch {
-      return null;
-    }
-  }
-  function showSection(name) {
-    Object.keys(sections).forEach((k) => {
-      sections[k].hidden = k !== name;
-    });
-  }
+function saveUsers(users) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+}
 
-  // ====== ESTADO LOGIN / REGISTER ======
-  let isRegisterMode = false;
+function setSession(email) {
+  localStorage.setItem(SESSION_KEY, email);
+}
 
-  function attachToggleListener() {
-    const toggle = document.getElementById('toggleToRegister');
-    if (!toggle) return;
-    toggle.onclick = () => {
-      setMode(!isRegisterMode);
-    };
-  }
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
 
-  function setMode(register) {
-    isRegisterMode = register;
+function getSession() {
+  return localStorage.getItem(SESSION_KEY);
+}
 
-    correoError.style.display = 'none';
-    claveError.style.display = 'none';
-    clave2Error.style.display = 'none';
+// --- Referencias DOM ---
+const authContainer = document.getElementById("auth-container");
+const mainContainer = document.getElementById("main-container");
 
-    if (register) {
-      loginButtonText.textContent = 'Crear usuario';
-      loginToggleText.innerHTML =
-        '¿Ya tienes cuenta? <strong id="toggleToRegister">Iniciar sesión</strong>';
-      clave2Field.style.display = 'block';
-    } else {
-      loginButtonText.textContent = 'Ingresar';
-      loginToggleText.innerHTML =
-        '¿No tienes cuenta? <strong id="toggleToRegister">Crear usuario</strong>';
-      clave2Field.style.display = 'none';
-    }
+const tabLogin = document.getElementById("tab-login");
+const tabRegister = document.getElementById("tab-register");
+const loginForm = document.getElementById("login-form");
+const registerForm = document.getElementById("register-form");
 
-    attachToggleListener();
-  }
+const loginEmail = document.getElementById("login-email");
+const loginPassword = document.getElementById("login-password");
+const loginError = document.getElementById("login-error");
 
-  function renderLoggedUser(user) {
-    headerUser.innerHTML = `
-      <span class="name">${user.email}</span>
-      <span class="role">Usuario</span>
-    `;
-  }
+const registerName = document.getElementById("register-name");
+const registerEmail = document.getElementById("register-email");
+const registerPassword = document.getElementById("register-password");
+const registerError = document.getElementById("register-error");
+const registerSuccess = document.getElementById("register-success");
 
-  function showAppForUser(user) {
-    loginBackdrop.style.display = 'none';
-    app.style.display = 'flex';
-    app.setAttribute('aria-hidden', 'false');
-    renderLoggedUser(user);
-    showSection('home');
+const userInfo = document.getElementById("user-info");
+const btnLogout = document.getElementById("btn-logout");
 
-    document
-      .querySelectorAll('.menu-item')
-      .forEach((i) => i.classList.remove('active'));
-    const homeItem = document.querySelector('.menu-item[data-section="home"]');
-    if (homeItem) homeItem.classList.add('active');
-  }
+const navLinks = document.querySelectorAll(".nav-link");
+const sections = {
+  inicio: document.getElementById("section-inicio"),
+  abecedario: document.getElementById("section-abecedario"),
+  vocabulario: document.getElementById("section-vocabulario"),
+  numeros: document.getElementById("section-numeros"),
+  juegos: document.getElementById("section-juegos"),
+  evaluacion: document.getElementById("section-evaluacion"),
+};
 
-  // ====== INICIO: ¿HAY SESIÓN GUARDADA? ======
-  const existingUser = getCurrentUser();
-  if (existingUser) {
-    showAppForUser(existingUser);
-  } else {
-    app.style.display = 'none';
-    app.setAttribute('aria-hidden', 'true');
-    loginBackdrop.style.display = 'flex';
-  }
-
-  setMode(false); // por defecto: modo login
-
-  // ====== LOGIN / REGISTRO ======
-  if (loginButton) {
-    loginButton.addEventListener('click', () => {
-      const correo = correoInput.value.trim();
-      const clave = claveInput.value.trim();
-      const clave2 = clave2Input ? clave2Input.value.trim() : '';
-
-      correoError.style.display = 'none';
-      claveError.style.display = 'none';
-      clave2Error.style.display = 'none';
-
-      let hasError = false;
-
-      if (!isValidEmail(correo)) {
-        correoError.style.display = 'block';
-        correoError.textContent = 'Correo inválido';
-        hasError = true;
-      }
-      if (!clave) {
-        claveError.style.display = 'block';
-        claveError.textContent = 'Clave obligatoria';
-        hasError = true;
-      }
-
-      if (isRegisterMode) {
-        // REGISTRO
-        if (!clave2) {
-          clave2Error.style.display = 'block';
-          clave2Error.textContent = 'Confirma la clave';
-          hasError = true;
-        } else if (clave !== clave2) {
-          clave2Error.style.display = 'block';
-          clave2Error.textContent = 'Las claves no coinciden';
-          hasError = true;
-        }
-
-        if (findUser(correo)) {
-          correoError.style.display = 'block';
-          correoError.textContent = 'Ya existe un usuario con este correo';
-          hasError = true;
-        }
-
-        if (!hasError) {
-          const users = getUsers();
-          const newUser = { email: correo, password: clave, role: 'student' };
-          users.push(newUser);
-          saveUsers(users);
-          alert('Usuario creado correctamente. Ahora inicia sesión.');
-          setMode(false);
-          claveInput.value = '';
-          if (clave2Input) clave2Input.value = '';
-        }
-      } else {
-        // LOGIN
-        const user = findUser(correo);
-        if (!user || user.password !== clave) {
-          claveError.style.display = 'block';
-          claveError.textContent = 'Correo o clave incorrectos';
-          hasError = true;
-        }
-
-        if (!hasError) {
-          setCurrentUser(user);
-          showAppForUser(user);
-        }
-      }
-    });
-  }
-
-  // ====== CERRAR SESIÓN (LOGOUT) ======
-  window.senalandiaLogout = function () {
-    setCurrentUser(null);
-
-    app.style.display = 'none';
-    app.setAttribute('aria-hidden', 'true');
-    loginBackdrop.style.display = 'flex';
-
-    if (correoInput) correoInput.value = '';
-    if (claveInput) claveInput.value = '';
-    if (clave2Input) clave2Input.value = '';
-
-    headerUser.innerHTML = `
-      <span class="name">Invitado</span>
-      <span class="role">No autenticado</span>
-    `;
-
-    setMode(false);
-  };
-
-  if (logoutButton) {
-    logoutButton.addEventListener('click', () => {
-      window.senalandiaLogout();
-    });
-  }
-
-  // ====== NAVEGACIÓN ======
-  menuItems.forEach((mi) =>
-    mi.addEventListener('click', () => {
-      menuItems.forEach((i) => i.classList.remove('active'));
-      mi.classList.add('active');
-      const target = mi.getAttribute('data-section');
-      showSection(target);
-    })
-  );
-
-  tiles.forEach((t) =>
-    t.addEventListener('click', () => {
-      const s = t.getAttribute('data-section');
-      const menu = document.querySelector(`.menu-item[data-section="${s}"]`);
-      if (menu) menu.click();
-    })
-  );
-
-  // ====== JUEGO DE MEMORIA: LETRA + SEÑA ======
-  const memoryBtn = document.getElementById('startMemory');
-  const memoryBoard = document.getElementById('memoryBoard');
-  const memoryStatus = document.getElementById('memoryStatus');
-  const memoryMovesSpan = document.getElementById('memoryMoves');
-  const memoryMatchesSpan = document.getElementById('memoryMatches');
-
-  let firstCard = null;
-  let secondCard = null;
-  let lockBoard = false;
-  let moves = 0;
-  let matches = 0;
-
-  // Cada pareja tiene un "id" y dos tipos: "letra" y "seña"
-  const pairs = [
-    { id: 'A', type: 'letra', text: 'Letra: A' },
-    { id: 'A', type: 'seña',  text: 'Seña de A ✋' },
-    { id: 'B', type: 'letra', text: 'Letra: B' },
-    { id: 'B', type: 'seña',  text: 'Seña de B ✋' },
-    { id: 'C', type: 'letra', text: 'Letra: C' },
-    { id: 'C', type: 'seña',  text: 'Seña de C ✋' },
-  ];
-
-  function shuffle(array){
-    for(let i = array.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
-
-  function createMemoryBoard(){
-    if (!memoryBoard) return;
-    memoryBoard.innerHTML = '';
-    const shuffled = shuffle([...pairs]);
-    firstCard = null;
-    secondCard = null;
-    lockBoard = false;
-    moves = 0;
-    matches = 0;
-    if (memoryMovesSpan) memoryMovesSpan.textContent = moves;
-    if (memoryMatchesSpan) memoryMatchesSpan.textContent = matches;
-    if (memoryStatus)
-      memoryStatus.textContent = 'Encuentra la pareja: letra + seña correspondiente.';
-
-    shuffled.forEach((data, index) => {
-      const card = document.createElement('button');
-      card.className = 'memory-card';
-      card.setAttribute('data-id', data.id);
-      card.setAttribute('data-type', data.type);
-      card.setAttribute('data-index', index);
-
-      const inner = document.createElement('div');
-      inner.className = 'memory-card-inner';
-      inner.textContent = '?';
-      card.appendChild(inner);
-
-      card.dataset.text = data.text; // para mostrar al revelar
-      card.addEventListener('click', () => handleCardClick(card));
-      memoryBoard.appendChild(card);
-    });
-  }
-
-  function handleCardClick(card){
-    if(lockBoard) return;
-    if(card.classList.contains('revealed')) return;
-    if(card === firstCard) return;
-
-    revealCard(card);
-
-    if(!firstCard){
-      firstCard = card;
-    }else{
-      secondCard = card;
-      lockBoard = true;
-      moves++;
-      if (memoryMovesSpan) memoryMovesSpan.textContent = moves;
-
-      const id1 = firstCard.getAttribute('data-id');
-      const id2 = secondCard.getAttribute('data-id');
-      const type1 = firstCard.getAttribute('data-type');
-      const type2 = secondCard.getAttribute('data-type');
-
-      // Coinciden si tienen el mismo id y tipos distintos (letra vs seña)
-      const isMatch = id1 === id2 && type1 !== type2;
-
-      if(isMatch){
-        matches++;
-        if (memoryMatchesSpan) memoryMatchesSpan.textContent = matches;
-        disablePair();
-        if(matches === pairs.length / 2){
-          if (memoryStatus)
-            memoryStatus.textContent =
-              `¡Excelente! Emparejaste todas las letras con sus señas en ${moves} intentos.`;
-        }else{
-          if (memoryStatus)
-            memoryStatus.textContent = '¡Muy bien! Sigue emparejando letras con señas.';
-        }
-      }else{
-        if (memoryStatus)
-          memoryStatus.textContent = 'No es la seña correcta, inténtalo de nuevo.';
-        setTimeout(hidePair, 900);
-      }
-    }
-  }
-
-  function revealCard(card){
-    card.classList.add('revealed');
-    const inner = card.querySelector('.memory-card-inner');
-    if (inner) inner.textContent = card.dataset.text || '';
-  }
-
-  function hidePair(){
-    if(firstCard) {
-      firstCard.classList.remove('revealed');
-      const inner1 = firstCard.querySelector('.memory-card-inner');
-      if (inner1) inner1.textContent = '?';
-    }
-    if(secondCard) {
-      secondCard.classList.remove('revealed');
-      const inner2 = secondCard.querySelector('.memory-card-inner');
-      if (inner2) inner2.textContent = '?';
-    }
-    resetTurn();
-  }
-
-  function disablePair(){
-    if(firstCard) firstCard.classList.add('disabled');
-    if(secondCard) secondCard.classList.add('disabled');
-    resetTurn();
-  }
-
-  function resetTurn(){
-    [firstCard, secondCard] = [null, null];
-    lockBoard = false;
-  }
-
-  if(memoryBtn && memoryBoard){
-    memoryBtn.addEventListener('click', () => {
-      createMemoryBoard();
-    });
-  }
-
-  // ====== EVALUACIÓN BÁSICA ======
-  const quizBtn = document.getElementById('startQuiz');
-  const quizResult = document.getElementById('quizResult');
-
-  if (quizBtn && quizResult) {
-    quizBtn.addEventListener('click', () => {
-      const selected = document.querySelector('input[name="q1"]:checked');
-
-      if (!selected) {
-        quizResult.innerHTML =
-          '<p style="color:#b91c1c; font-size:13px;">Por favor, selecciona una respuesta.</p>';
-        return;
-      }
-
-      if (selected.value === 'b') {
-        quizResult.innerHTML =
-          '<p style="color:#16a34a; font-size:13px;">¡Muy bien! La seña representa visualmente la misma letra y ayuda a comunicarla.</p>';
-      } else {
-        quizResult.innerHTML =
-          '<p style="color:#b45309; font-size:13px;">Casi... Recuerda que la seña tiene una relación directa con la letra o palabra que representa.</p>';
-      }
-    });
-  }
+// --- Cambio de pestañas (login / registro) ---
+tabLogin.addEventListener("click", () => {
+  tabLogin.classList.add("active");
+  tabRegister.classList.remove("active");
+  loginForm.classList.add("visible");
+  registerForm.classList.remove("visible");
+  loginError.hidden = true;
 });
 
+tabRegister.addEventListener("click", () => {
+  tabRegister.classList.add("active");
+  tabLogin.classList.remove("active");
+  registerForm.classList.add("visible");
+  loginForm.classList.remove("visible");
+  registerError.hidden = true;
+  registerSuccess.hidden = true;
+});
+
+// --- Registro de usuario ---
+registerForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  registerError.hidden = true;
+  registerSuccess.hidden = true;
+
+  const name = registerName.value.trim();
+  const email = registerEmail.value.trim().toLowerCase();
+  const password = registerPassword.value.trim();
+
+  if (!name || !email || !password) {
+    registerError.textContent = "Por favor, completa todos los campos.";
+    registerError.hidden = false;
+    return;
+  }
+
+  if (password.length < 4) {
+    registerError.textContent = "La contraseña debe tener mínimo 4 caracteres.";
+    registerError.hidden = false;
+    return;
+  }
+
+  const users = getUsers();
+  const exists = users.some((u) => u.email === email);
+
+  if (exists) {
+    registerError.textContent = "Ya existe un usuario con este correo.";
+    registerError.hidden = false;
+    return;
+  }
+
+  users.push({ name, email, password });
+  saveUsers(users);
+
+  registerSuccess.textContent = "Usuario creado correctamente. Ahora puedes iniciar sesión.";
+  registerSuccess.hidden = false;
+  registerForm.reset();
+});
+
+// --- Login ---
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  loginError.hidden = true;
+
+  const email = loginEmail.value.trim().toLowerCase();
+  const password = loginPassword.value.trim();
+
+  const users = getUsers();
+  const user = users.find((u) => u.email === email && u.password === password);
+
+  if (!user) {
+    loginError.textContent = "Correo o contraseña incorrectos.";
+    loginError.hidden = false;
+    return;
+  }
+
+  setSession(user.email);
+  showMainForUser(user);
+});
+
+// --- Mostrar contenido principal ---
+function showMainForUser(user) {
+  authContainer.hidden = true;
+  mainContainer.hidden = false;
+  userInfo.textContent = `Bienvenido, ${user.name}`;
+  // Por defecto, sección Inicio
+  showSection("inicio");
+}
+
+// --- Cerrar sesión ---
+btnLogout.addEventListener("click", () => {
+  clearSession();
+  // Reinicia estado visual
+  mainContainer.hidden = false;
+  authContainer.hidden = false;
+
+  // Oculta contenido principal
+  mainContainer.hidden = true;
+  authContainer.hidden = false;
+
+  // Limpia formularios y mensajes
+  loginForm.reset();
+  registerForm.reset();
+  loginError.hidden = true;
+  registerError.hidden = true;
+  registerSuccess.hidden = true;
+
+  // Vuelve a la pestaña de Login
+  tabLogin.classList.add("active");
+  tabRegister.classList.remove("active");
+  loginForm.classList.add("visible");
+  registerForm.classList.remove("visible");
+});
+
+// --- Navegación entre secciones ---
+function showSection(key) {
+  Object.values(sections).forEach((sec) => sec.classList.remove("visible"));
+  if (sections[key]) {
+    sections[key].classList.add("visible");
+  }
+
+  navLinks.forEach((btn) => {
+    if (btn.dataset.section === key) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+}
+
+navLinks.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const key = btn.dataset.section;
+    showSection(key);
+  });
+});
+
+// --- Recuperar sesión al recargar la página ---
+window.addEventListener("DOMContentLoaded", () => {
+  const email = getSession();
+  if (!email) {
+    // Sin sesión -> mostrar login
+    authContainer.hidden = false;
+    mainContainer.hidden = true;
+    return;
+  }
+
+  const users = getUsers();
+  const user = users.find((u) => u.email === email);
+  if (user) {
+    showMainForUser(user);
+  } else {
+    clearSession();
+    authContainer.hidden = false;
+    mainContainer.hidden = true;
+  }
+
+  // Inicializar juego
+  initSignGame();
+  // Inicializar evaluación
+  initQuiz();
+});
+
+// --- Juego "Adivina la seña" ---
+const words = [
+  {
+    word: "CASA",
+    clue: "La seña muestra las manos formando el techo de una casa sobre la cabeza.",
+    options: ["CASA", "ÁRBOL", "LIBRO"],
+  },
+  {
+    word: "MAMÁ",
+    clue: "La seña se realiza cerca de la boca, con la mano abierta, asociada a la persona que cuida.",
+    options: ["MAMÁ", "PAPÁ", "AMIGO"],
+  },
+  {
+    word: "ESCUELA",
+    clue: "Las manos se juntan como si aplaudieran de forma suave, representando un lugar de estudio.",
+    options: ["ESCUELA", "JUEGO", "PERRO"],
+  },
+  {
+    word: "AMIGO",
+    clue: "Las manos se entrelazan o se cruzan como símbolo de unión entre personas.",
+    options: ["AMIGO", "COMIDA", "NIÑO"],
+  },
+  {
+    word: "LIBRO",
+    clue: "Las manos se abren y cierran como si se estuviera leyendo un objeto.",
+    options: ["LIBRO", "CASA", "CARRO"],
+  },
+];
+
+let currentRound = null;
+
+function initSignGame() {
+  const clueEl = document.getElementById("sign-clue");
+  const optionsEl = document.getElementById("sign-options");
+  const feedbackEl = document.getElementById("sign-feedback");
+  const btnNewRound = document.getElementById("btn-new-round");
+
+  function renderRound() {
+    feedbackEl.textContent = "";
+    optionsEl.innerHTML = "";
+
+    currentRound = words[Math.floor(Math.random() * words.length)];
+
+    clueEl.textContent = currentRound.clue;
+
+    currentRound.options.forEach((opt) => {
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.className = "option-btn";
+      btn.addEventListener("click", () => {
+        if (opt === currentRound.word) {
+          btn.classList.add("correct");
+          feedbackEl.textContent = "¡Muy bien! Esa es la palabra correcta.";
+        } else {
+          btn.classList.add("incorrect");
+          feedbackEl.textContent = "No es la palabra correcta. Intenta de nuevo.";
+        }
+      });
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  btnNewRound.addEventListener("click", renderRound);
+  renderRound();
+}
+
+// --- Evaluación ---
+function initQuiz() {
+  const quizForm = document.getElementById("quiz-form");
+  const quizResult = document.getElementById("quiz-result");
+
+  const correctAnswers = {
+    q1: "b",
+    q2: "a",
+    q3: "b",
+  };
+
+  quizForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let score = 0;
+    let total = Object.keys(correctAnswers).length;
+
+    Object.keys(correctAnswers).forEach((q) => {
+      const selected = quizForm.querySelector(`input[name="${q}"]:checked`);
+      if (selected && selected.value === correctAnswers[q]) {
+        score++;
+      }
+    });
+
+    quizResult.textContent = `Obtuviste ${score} de ${total} respuestas correctas. ${
+      score === total
+        ? "¡Excelente trabajo!"
+        : score >= 2
+        ? "¡Vas muy bien, sigue practicando!"
+        : "Te invitamos a revisar nuevamente los recursos y volver a intentarlo."
+    }`;
+  });
+}
+
+// Inicialización si el DOM ya está listo antes del listener
+if (document.readyState === "complete" || document.readyState === "interactive") {
+  if (document.getElementById("sign-clue")) {
+    initSignGame();
+    initQuiz();
+  }
+}

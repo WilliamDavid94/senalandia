@@ -1,142 +1,140 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Señalandia - Plataforma educativa</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/styles.css" />
-</head>
-<body>
-  <!-- Fondo animado -->
-  <div class="bg-animated"></div>
-
-  <div id="app-root" class="app-container">
-    <!-- LOGIN / REGISTRO -->
-    <div id="auth-container" class="auth-card">
-      <h1 class="logo-title">Señalandia</h1>
-      <p class="logo-subtitle">
-        Plataforma educativa para niños, niñas y adolescentes con discapacidad auditiva.
-      </p>
-
-      <!-- Selector de pestañas -->
-      <div class="tabs">
-        <button id="tab-login" class="tab-button active">Iniciar sesión</button>
-        <button id="tab-register" class="tab-button">Crear usuario</button>
-      </div>
-
-      <!-- Formulario LOGIN -->
-      <form id="login-form" class="form visible">
-        <label>
-          Correo
-          <input type="email" id="login-email" required placeholder="tu@correo.com" />
-        </label>
-        <label>
-          Contraseña
-          <input type="password" id="login-password" required placeholder="********" />
-        </label>
-        <button type="submit" class="btn-primary">Ingresar</button>
-        <p id="login-error" class="error-text" hidden></p>
-      </form>
-
-      <!-- Formulario REGISTRO -->
-      <form id="register-form" class="form">
-        <label>
-          Nombre del estudiante
-          <input type="text" id="register-name" required placeholder="Nombre completo" />
-        </label>
-        <label>
-          Correo
-          <input type="email" id="register-email" required placeholder="tu@correo.com" />
-        </label>
-        <label>
-          Contraseña
-          <input type="password" id="register-password" required minlength="4" placeholder="Mínimo 4 caracteres" />
-        </label>
-        <button type="submit" class="btn-primary">Crear cuenta</button>
-        <p id="register-error" class="error-text" hidden></p>
-        <p id="register-success" class="success-text" hidden></p>
-      </form>
-    </div>
-
-    <!-- CONTENIDO PRINCIPAL (SOLO SI HAY SESIÓN) -->
-    <div id="main-container" class="main-layout" hidden>
-      <header class="topbar">
-        <div class="topbar-left">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Señalandia - Plataforma Inclusiva</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <!-- CAPA DE LOGIN / REGISTRO -->
+    <div class="login-backdrop" id="loginBackdrop">
+      <div class="login-card" role="dialog" aria-modal="true">
+        <div class="logo-area">
           <div class="logo-circle">S</div>
           <div>
-            <h1 class="topbar-title">Señalandia</h1>
-            <p class="topbar-subtitle">Aprendemos juntos con lengua de señas</p>
+            <div class="logo-title">Señalandia</div>
+            <div class="logo-subtitle">
+              Plataforma de apoyo para niñas y niños con discapacidad auditiva
+            </div>
           </div>
         </div>
-        <div class="topbar-right">
-          <span id="user-info" class="user-info"></span>
-          <button id="btn-logout" class="btn-outline">Cerrar sesión</button>
+
+        <div class="login-field" style="margin-top: 16px;">
+          <label for="loginCorreo" class="login-label">Correo electrónico</label>
+          <input
+            id="loginCorreo"
+            type="email"
+            class="login-input"
+            placeholder="nombre@ejemplo.com"
+          />
+          <div id="loginCorreoError" class="login-error"></div>
+        </div>
+
+        <div class="login-field">
+          <label for="loginClave" class="login-label">Clave</label>
+          <input
+            id="loginClave"
+            type="password"
+            class="login-input"
+            placeholder="Ingresa tu clave"
+          />
+          <div id="loginClaveError" class="login-error"></div>
+        </div>
+
+        <div class="login-field" id="loginClave2Field" style="display: none;">
+          <label for="loginClave2" class="login-label">Confirmar clave</label>
+          <input
+            id="loginClave2"
+            type="password"
+            class="login-input"
+            placeholder="Repite tu clave"
+          />
+          <div id="loginClave2Error" class="login-error"></div>
+        </div>
+
+        <div class="login-footer">
+          <button id="loginButton" class="login-button" type="button">
+            <span id="loginButtonText">Ingresar</span>
+          </button>
+          <div id="loginToggleText" class="login-extra">
+            ¿No tienes cuenta?
+            <strong id="toggleToRegister">Crear usuario</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP PROTEGIDA (solo se muestra si hay sesión iniciada) -->
+    <div id="app" class="app-container" aria-hidden="true">
+      <header class="app-header">
+        <div>
+          <h1>Señalandia</h1>
+          <p>Plataforma de aprendizaje inclusivo</p>
+        </div>
+        <div class="header-right">
+          <div id="headerUser" class="header-user">
+            <span class="name">Invitado</span>
+            <span class="role">No autenticado</span>
+          </div>
+          <button id="logoutButton" class="btn-logout" type="button">
+            Cerrar sesión
+          </button>
         </div>
       </header>
 
-      <div class="content-wrapper">
-        <!-- MENÚ LATERAL -->
+      <main class="app-main">
         <nav class="sidebar">
-          <h2>Secciones</h2>
-          <ul>
-            <li><button class="nav-link active" data-section="inicio">Inicio</button></li>
-            <li><button class="nav-link" data-section="abecedario">Abecedario</button></li>
-            <li><button class="nav-link" data-section="vocabulario">Vocabulario</button></li>
-            <li><button class="nav-link" data-section="numeros">Números</button></li>
-            <li><button class="nav-link" data-section="juegos">Juegos</button></li>
-            <li><button class="nav-link" data-section="evaluacion">Evaluación</button></li>
+          <ul class="menu-list">
+            <li class="menu-item active" data-section="home">Inicio</li>
+            <li class="menu-item" data-section="abecedario">Abecedario en señas</li>
+            <li class="menu-item" data-section="vocabulario">Vocabulario cotidiano</li>
+            <li class="menu-item" data-section="numeros">Números en señas</li>
+            <li class="menu-item" data-section="juegos">Juegos inclusivos</li>
+            <li class="menu-item" data-section="evaluacion">Evaluación básica</li>
           </ul>
         </nav>
 
-        <!-- CONTENIDO -->
-        <main class="main-content">
+        <section class="content-area">
           <!-- INICIO -->
-          <section id="section-inicio" class="section visible">
+          <section id="section-home" class="section">
             <h2>Bienvenido a Señalandia</h2>
             <p>
-              Esta plataforma fue diseñada para apoyar el proceso de aprendizaje de
-              niños, niñas y adolescentes con discapacidad auditiva, fortaleciendo
-              la inclusión y el acceso al conocimiento a través de recursos visuales,
-              juegos y actividades interactivas.
+              Esta plataforma está pensada para apoyar el aprendizaje de niñas y
+              niños con discapacidad auditiva, sus familias y docentes.
+              Navega por las secciones para ver el abecedario en lengua de señas,
+              vocabulario básico, números y actividades lúdicas.
             </p>
-            <div class="cards-grid">
-              <article class="info-card">
-                <h3>Aprendizaje visual</h3>
-                <p>
-                  Videos, pictogramas y actividades adaptadas para favorecer la
-                  comprensión de los contenidos.
-                </p>
-              </article>
-              <article class="info-card">
-                <h3>Lengua de señas</h3>
-                <p>
-                  Material para el reconocimiento del abecedario, vocabulario
-                  cotidiano y números en lengua de señas.
-                </p>
-              </article>
-              <article class="info-card">
-                <h3>Participación de la familia</h3>
-                <p>
-                  Recursos que permiten a cuidadores y docentes acompañar el
-                  proceso de aprendizaje.
-                </p>
-              </article>
+
+            <div class="tiles">
+              <div class="tile" data-section="abecedario">
+                Abecedario en señas
+              </div>
+              <div class="tile" data-section="vocabulario">
+                Vocabulario cotidiano
+              </div>
+              <div class="tile" data-section="numeros">
+                Números en señas
+              </div>
+              <div class="tile" data-section="juegos">
+                Juegos inclusivos
+              </div>
             </div>
           </section>
 
           <!-- ABECEDARIO -->
-          <section id="section-abecedario" class="section">
+          <section id="section-abecedario" class="section" hidden>
             <h2>Abecedario en lengua de señas</h2>
             <p class="text-muted">
-              Recursos en video para apoyar el aprendizaje del abecedario en lengua de señas.
+              A continuación, algunos recursos en video para apoyar el aprendizaje
+              del abecedario en lengua de señas.
             </p>
 
             <div class="video-wrap">
               <iframe
                 src="https://www.youtube.com/embed/gOXn7U_xwYk"
-                title="Abecedario Lengua de Señas Colombiana"
+                title="Abecedario en Lengua de Señas Colombiana"
                 allowfullscreen
-                loading="lazy"
               ></iframe>
             </div>
 
@@ -144,9 +142,8 @@
               <div class="video-card">
                 <iframe
                   src="https://www.youtube.com/embed/3bJth4LwHe4"
-                  title="Abecedario en lengua de señas - Refuerzo"
+                  title="Abecedario LSC - Ejemplo 1"
                   allowfullscreen
-                  loading="lazy"
                 ></iframe>
                 <p class="caption">
                   Video de refuerzo para la práctica del abecedario.
@@ -155,19 +152,18 @@
               <div class="video-card">
                 <iframe
                   src="https://www.youtube.com/embed/gC9drIW6DC0"
-                  title="Abecedario en lengua de señas - Juego y práctica"
+                  title="Abecedario LSC - Ejemplo 2"
                   allowfullscreen
-                  loading="lazy"
                 ></iframe>
                 <p class="caption">
-                  Propuesta lúdica para trabajar las letras en señas.
+                  Otra propuesta visual para trabajar las letras en señas.
                 </p>
               </div>
             </div>
           </section>
 
           <!-- VOCABULARIO -->
-          <section id="section-vocabulario" class="section">
+          <section id="section-vocabulario" class="section" hidden>
             <h2>Vocabulario cotidiano en señas</h2>
             <p class="text-muted">
               Palabras de uso diario que facilitan la comunicación en familia
@@ -177,9 +173,8 @@
             <div class="video-wrap">
               <iframe
                 src="https://www.youtube.com/embed/qA9snFwU_KU"
-                title="Vocabulario básico en lengua de señas"
+                title="Vocabulario básico en Lengua de Señas"
                 allowfullscreen
-                loading="lazy"
               ></iframe>
             </div>
 
@@ -187,9 +182,8 @@
               <div class="video-card">
                 <iframe
                   src="https://www.youtube.com/embed/MVIBosHuLlI"
-                  title="Saludos en lengua de señas"
+                  title="Saludos en señas"
                   allowfullscreen
-                  loading="lazy"
                 ></iframe>
                 <p class="caption">
                   Saludos y expresiones básicas para la vida diaria.
@@ -198,9 +192,8 @@
               <div class="video-card">
                 <iframe
                   src="https://www.youtube.com/embed/3XnTA1pVf_M"
-                  title="Vocabulario escolar en lengua de señas"
+                  title="Vocabulario escolar en señas"
                   allowfullscreen
-                  loading="lazy"
                 ></iframe>
                 <p class="caption">
                   Palabras usadas en el aula: profesor, cuaderno, tarea, etc.
@@ -210,19 +203,18 @@
           </section>
 
           <!-- NÚMEROS -->
-          <section id="section-numeros" class="section">
+          <section id="section-numeros" class="section" hidden>
             <h2>Números en lengua de señas</h2>
             <p class="text-muted">
-              Recursos para aprender los números en lengua de señas, desde conteos básicos
-              hasta números más avanzados.
+              Recursos para aprender los números en lengua de señas, desde los
+              conteos básicos hasta números mayores.
             </p>
 
             <div class="video-wrap">
               <iframe
                 src="https://www.youtube.com/embed/2zP7FpC18m0"
-                title="Números del 1 al 20 en lengua de señas"
+                title="Números del 1 al 20 en señas"
                 allowfullscreen
-                loading="lazy"
               ></iframe>
             </div>
 
@@ -230,20 +222,16 @@
               <div class="video-card">
                 <iframe
                   src="https://www.youtube.com/embed/J8L87n6mZIo"
-                  title="Números del 1 al 10 en lengua de señas"
+                  title="Números del 1 al 10"
                   allowfullscreen
-                  loading="lazy"
                 ></iframe>
-                <p class="caption">
-                  Conteo básico para los más pequeños.
-                </p>
+                <p class="caption">Conteo básico para los más pequeños.</p>
               </div>
               <div class="video-card">
                 <iframe
                   src="https://www.youtube.com/embed/dBipFN9vSeY"
-                  title="Números avanzados en lengua de señas"
+                  title="Números mayores"
                   allowfullscreen
-                  loading="lazy"
                 ></iframe>
                 <p class="caption">
                   Ejercicios de conteo y números más avanzados.
@@ -253,91 +241,46 @@
           </section>
 
           <!-- JUEGOS -->
-          <section id="section-juegos" class="section">
-            <h2>Juegos en Señalandia</h2>
+          <section id="section-juegos" class="section" hidden>
+            <h2>Juego de memoria: letras y señas</h2>
             <p class="text-muted">
-              Actividades lúdicas para reforzar el aprendizaje del abecedario, vocabulario y números.
+              Relaciona la letra con la descripción de su seña. Es una forma
+              lúdica de fortalecer la memoria visual y el vínculo letra–seña.
             </p>
 
-            <div class="game-card">
-              <h3>Juego: Adivina la seña</h3>
-              <p>
-                Observa la descripción de la seña y elige la palabra correcta.
-                Este juego está pensado como una aproximación a la lengua de señas.
-              </p>
-              <div id="sign-clue" class="sign-clue"></div>
-              <div class="options-grid" id="sign-options"></div>
-              <p id="sign-feedback" class="feedback-text"></p>
-              <button id="btn-new-round" class="btn-secondary">Nueva palabra</button>
+            <div class="game-panel">
+              <div class="game-info">
+                <div class="memory-status" id="memoryStatus">
+                  Haz clic en "Iniciar / Reiniciar juego" para comenzar.
+                </div>
+                <div class="memory-stats">
+                  Intentos: <span id="memoryMoves">0</span> |
+                  Aciertos: <span id="memoryMatches">0</span>
+                </div>
+              </div>
+              <button id="startMemory" class="btn btn-primary" type="button">
+                Iniciar / Reiniciar juego
+              </button>
+              <div id="memoryBoard" class="memory-board"></div>
             </div>
           </section>
 
           <!-- EVALUACIÓN -->
-          <section id="section-evaluacion" class="section">
-            <h2>Evaluación de aprendizaje</h2>
+          <section id="section-evaluacion" class="section" hidden>
+            <h2>Evaluación básica</h2>
             <p class="text-muted">
-              Responde las siguientes preguntas para verificar lo aprendido.
+              Este espacio puede usarse para realizar pequeñas verificaciones
+              de comprensión y seguimiento a los avances del estudiante.
             </p>
-
-            <form id="quiz-form" class="quiz-form">
-              <div class="quiz-question">
-                <p>1. ¿Para qué está pensada la plataforma Señalandia?</p>
-                <label>
-                  <input type="radio" name="q1" value="a" />
-                  Para jugar videojuegos sin relación con el aprendizaje.
-                </label>
-                <label>
-                  <input type="radio" name="q1" value="b" />
-                  Para apoyar el proceso educativo de niños con discapacidad auditiva.
-                </label>
-                <label>
-                  <input type="radio" name="q1" value="c" />
-                  Solo para que los docentes registren notas.
-                </label>
-              </div>
-
-              <div class="quiz-question">
-                <p>2. ¿Qué tipo de recursos encuentras en Señalandia?</p>
-                <label>
-                  <input type="radio" name="q2" value="a" />
-                  Videos, juegos y actividades pensadas para la lengua de señas.
-                </label>
-                <label>
-                  <input type="radio" name="q2" value="b" />
-                  Solo documentos de texto para descargar.
-                </label>
-                <label>
-                  <input type="radio" name="q2" value="c" />
-                  Únicamente evaluaciones escritas.
-                </label>
-              </div>
-
-              <div class="quiz-question">
-                <p>3. ¿Cuál es el rol de la familia y los docentes en la plataforma?</p>
-                <label>
-                  <input type="radio" name="q3" value="a" />
-                  No tienen participación.
-                </label>
-                <label>
-                  <input type="radio" name="q3" value="b" />
-                  Pueden acompañar y reforzar el aprendizaje del estudiante.
-                </label>
-                <label>
-                  <input type="radio" name="q3" value="c" />
-                  Solo deben revisar las calificaciones finales.
-                </label>
-              </div>
-
-              <button type="submit" class="btn-primary">Enviar respuestas</button>
-              <p id="quiz-result" class="quiz-result"></p>
-            </form>
+            <button id="startQuiz" class="btn btn-ghost" type="button">
+              Mostrar ejemplo de evaluación
+            </button>
+            <div id="quizResult" style="margin-top: 10px;"></div>
           </section>
-        </main>
-      </div>
+        </section>
+      </main>
     </div>
-  </div>
 
-  <script src="js/app.js"></script>
-</body>
+    <script src="js/app.js"></script>
+  </body>
 </html>
-

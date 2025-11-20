@@ -387,13 +387,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ====== DEMO EVALUACIÓN ======
+  // ====== EVALUACIÓN BÁSICA ======
   const quizBtn = document.getElementById('startQuiz');
   const quizResult = document.getElementById('quizResult');
+
   if (quizBtn && quizResult) {
     quizBtn.addEventListener('click', () => {
-      quizResult.innerHTML =
-        '<p>Demo: aquí puedes agregar preguntas tipo selección múltiple sobre el abecedario y vocabulario en señas.</p>';
+      const selected = document.querySelector('input[name="q1"]:checked');
+
+      if (!selected) {
+        quizResult.innerHTML =
+          '<p style="color:#b91c1c; font-size:13px;">Por favor, selecciona una respuesta.</p>';
+        return;
+      }
+
+      if (selected.value === 'b') {
+        quizResult.innerHTML =
+          '<p style="color:#16a34a; font-size:13px;">¡Muy bien! La seña representa visualmente la misma letra y ayuda a comunicarla.</p>';
+      } else {
+        quizResult.innerHTML =
+          '<p style="color:#b45309; font-size:13px;">Casi... Recuerda que la seña tiene una relación directa con la letra o palabra que representa.</p>';
+      }
     });
   }
 });
+
